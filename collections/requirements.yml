@@ -1,0 +1,8 @@
+---
+
+collections:
+  - name: redhat.eap
+  - name: community.general
+  - name: https://github.com/ansible-middleware/common
+    version: main
+    type: git

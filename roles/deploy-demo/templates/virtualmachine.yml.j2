@@ -1,0 +1,78 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  labels:
+    app: {{ demo_name }}
+    vm.kubevirt.io/template: rhel9-server-small
+    vm.kubevirt.io/template.revision: "1"
+    vm.kubevirt.io/template.version: v0.19.6
+  name: {{ demo_name }}
+  namespace: {{ demo_namespace }}
+spec:
+  dataVolumeTemplates:
+  - apiVersion: cdi.kubevirt.io/v1beta1
+    kind: DataVolume
+    metadata:
+      name: {{ demo_name }}
+    spec:
+      sourceRef:
+        kind: DataSource
+        name: {{ vm_datasource_name }}
+        namespace: {{ vm_datasource_namespace }}
+      storage:
+        resources:
+          requests:
+            storage: {{ vm_storage_requests }}
+  running: true
+  template:
+    metadata:
+      annotations:
+        vm.kubevirt.io/flavor: small
+        vm.kubevirt.io/os: rhel9
+        vm.kubevirt.io/workload: server
+      labels:
+        kubevirt.io/domain: {{ demo_name }}
+        kubevirt.io/size: small
+    spec:
+      domain:
+        cpu:
+          cores: {{ vm_cpus_cores }}
+          sockets: {{ vm_cpus_sockets }}
+          threads: {{ vm_cpus_threads }}
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: {{ demo_name }}
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+          interfaces:
+          - masquerade: {}
+            name: default
+          networkInterfaceMultiqueue: true
+          rng: {}
+        features:
+          smm:
+            enabled: true
+        firmware:
+          bootloader:
+            efi: {}
+        machine:
+          type: {{ vm_machine_type }}
+        resources:
+          requests:
+            memory: {{ vm_memory_requests }}
+      evictionStrategy: LiveMigrate
+      networks:
+      - name: default
+        pod: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+      - dataVolume:
+          name: {{ demo_name }}
+        name: {{ demo_name }}
+      - cloudInitNoCloud:
+          secretRef:
+            name: {{ cloud_init_secret }}
+        name: cloudinitdisk

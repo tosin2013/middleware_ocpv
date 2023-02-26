@@ -1,0 +1,17 @@
+---
+
+ssh_private_key_path: ""
+ssh_public_key_path: ""
+
+automationhub_token: ""
+
+jbossnetwork_client_id: ""
+jbossnetwork_client_secret: ""
+
+redhat_csp_username: ""
+redhat_csp_password: ""
+
+controller_hostname: ""
+controller_username: ""
+controller_password: ""
+controller_validate_certs: false

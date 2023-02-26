@@ -1,0 +1,20 @@
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Configure OpenShift
+      ansible.builtin.include_role:
+        name: deploy-demo
+        tasks_from: configure-ocp.yml
+
+    - name: k8s Discovery
+      ansible.builtin.include_role:
+        name: k8s-discovery
+
+- hosts: eap
+  collections:
+    redhat.eap
+  tasks:
+    - name: Configure VM
+      ansible.builtin.include_role:
+        name: deploy-demo
+        tasks_from: configure-vm.yml

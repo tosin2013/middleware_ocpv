@@ -1,0 +1,6 @@
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Install OpenShift Virtualization
+      ansible.builtin.include_role:
+        name: ocpv-install
