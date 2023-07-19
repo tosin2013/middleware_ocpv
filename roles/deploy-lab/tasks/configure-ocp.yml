@@ -1,6 +1,6 @@
 ---
 
-- name: "Create {{ demo_namespace }} Namespace"
+- name: "Create {{ lab_namespace }} Namespace"
   kubernetes.core.k8s:
     state: present
     template: namespace.yml.j2
@@ -36,7 +36,7 @@
       type: Generic
       metadata:
         name: "{{ cloud_init_secret }}"
-        namespace: "{{ demo_namespace }}"
+        namespace: "{{ lab_namespace }}"
       data:
         userdata: "{{ cloud_init_content | b64encode }}"
 
@@ -49,29 +49,29 @@
   kubernetes.core.k8s_info:
     api_version: kubevirt.io/v1
     kind: VirtualMachine
-    name: "{{ demo_name }}"
-    namespace: "{{ demo_namespace }}"
-  register: demo_vm
+    name: "{{ lab_name }}"
+    namespace: "{{ lab_namespace }}"
+  register: lab_vm
   retries: 60
   delay: 10
   until:
-  - demo_vm.resources[0].status is defined
-  - demo_vm.resources[0].status.ready is true
+  - lab_vm.resources[0].status is defined
+  - lab_vm.resources[0].status.ready is true
 
 - name: Wait for VM IP to be populated
   kubernetes.core.k8s_info:
     api_version: kubevirt.io/v1
     kind: VirtualMachineInstance
-    name: "{{ demo_name }}"
-    namespace: "{{ demo_namespace }}"
-  register: demo_vmi
+    name: "{{ lab_name }}"
+    namespace: "{{ lab_namespace }}"
+  register: lab_vmi
   retries: 60
   delay: 10
-  until: (demo_vmi.resources[0].status.interfaces[0]['ipAddress'] | default('')) | length > 0
+  until: (lab_vmi.resources[0].status.interfaces[0]['ipAddress'] | default('')) | length > 0
 
 - name: Wait for SSH Connection to be ready
   ansible.builtin.wait_for:
-    host: "{{ demo_vmi.resources[0].status.interfaces[0]['ipAddress'] }}"
+    host: "{{ lab_vmi.resources[0].status.interfaces[0]['ipAddress'] }}"
     port: 22
 
 - name: "Create Service"

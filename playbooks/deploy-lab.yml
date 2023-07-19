@@ -3,7 +3,7 @@
   tasks:
     - name: Configure OpenShift
       ansible.builtin.include_role:
-        name: deploy-demo
+        name: deploy-lab
         tasks_from: configure-ocp.yml
 
     - name: k8s Discovery
@@ -16,5 +16,5 @@
   tasks:
     - name: Configure VM
       ansible.builtin.include_role:
-        name: deploy-demo
+        name: deploy-lab
         tasks_from: configure-vm.yml

@@ -1,8 +1,8 @@
 ---
-# defaults file for deploy-demo
+# defaults file for deploy-lab
 
-demo_namespace: ansible-middleware-ocpv
-demo_name: eap-demo
+lab_namespace: ansible-middleware-ocpv
+lab_name: eap-lab
 vm_cpus_cores: 2
 vm_cpus_sockets: 1
 vm_cpus_threads: 1
