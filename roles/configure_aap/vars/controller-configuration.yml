@@ -1,0 +1,160 @@
+---
+# vars file for configure_aap
+
+controller_credential_types:
+  - name: "{{ aap_credential_type_publickey_name }}"
+    description: "{{ aap_credential_type_publickey_name }}"
+    kind: cloud
+    inputs:
+      fields:
+        - id: ssh_public_key
+          type: string
+          label: ssh_public_key
+          secret: true
+      required:
+        - ssh_public_key
+    injectors:
+      extra_vars:
+        ssh_public_key: "{  { ssh_public_key }}"
+  - name: "{{ aap_credential_type_redhat_csp_name }}"
+    description: "{{ aap_credential_type_redhat_csp_name }}"
+    kind: cloud
+    inputs:
+      fields:
+        - id: username
+          type: string
+          label: Username
+        - id: password
+          type: string
+          label: Password
+          secret: true
+      required:
+        - username
+        - password  
+    injectors:
+      extra_vars:
+        redhat_portal_username: "{  { username }}"
+        redhat_portal_password: "{  { password }}"
+  - name: "{{ aap_credential_type_redhat_serviceaccount_name }}"
+    description: "{{ aap_credential_type_redhat_serviceaccount_name }}"
+    kind: cloud
+    inputs:
+      fields:
+        - id: client_id
+          type: string
+          label: Client ID
+        - id: client_secret
+          type: string
+          label: Client Secret
+          secret: true
+      required:
+        - client_id
+        - client_secret
+    injectors:
+      extra_vars:
+        redhat_serviceaccount_client_id: "{  { client_id }}"
+        redhat_serviceaccount_client_secret: "{  { client_secret }}"
+
+controller_credentials:
+  - name: "{{ aap_credential_machine_name }}"
+    organization: "{{ aap_organization }}"
+    credential_type: Machine
+    inputs:
+      username: "{{ ocpv_ssh_user }}"
+      ssh_key_data: "{{ lookup('file', ssh_private_key_path) }}"
+  - name: "{{ aap_credential_jbossnetwork_name }}"
+    organization: "{{ aap_organization }}"
+    credential_type: "{{ aap_credential_type_redhat_serviceaccount_name }}"
+    inputs:
+      client_id: "{{ jbossnetwork_client_id }}"
+      client_secret: "{{ jbossnetwork_client_secret }}"
+  - name: "{{ aap_credential_automationhub_name }}"
+    organization: "{{ aap_organization }}"
+    credential_type: Ansible Galaxy/Automation Hub API Token
+    inputs:
+      url: "{{ automationhub_server_url }}"
+      auth_url: "{{ automationhub_auth_server_url }}"
+      token: "{{ automationhub_token }}"
+  - name: "{{ aap_credential_openshift_name }}"
+    description: "{{ aap_credential_openshift_name }}"
+    credential_type: "OpenShift or Kubernetes API Bearer Token"
+    organization: "{{ aap_organization }}"
+    inputs:
+      host: "{{ aap_credential_openshift_host }}"
+      verify_ssl: false
+      bearer_token: "{{ configure_aap_aap_ocp_sa_token }}"
+  - name: "{{ aap_credential_publickey_name }}"
+    description: "{{ aap_credential_openshift_name }}"
+    credential_type: "{{ aap_credential_type_publickey_name }}"
+    organization: "{{ aap_organization }}"
+    inputs:
+      ssh_public_key: "{{ lookup('file', ssh_public_key_path) }}"
+  - name: "{{ aap_credential_redhat_csp_name }}"
+    description: "{{ aap_credential_redhat_csp_name }}"
+    credential_type: "{{ aap_credential_type_redhat_csp_name }}"
+    organization: "{{ aap_organization }}"
+    inputs:
+      username: "{{ redhat_csp_username }}"
+      password: "{{ redhat_csp_password }}"
+
+
+controller_organizations:
+  - name: "{{ aap_organization }}"
+    galaxy_credentials: 
+      - "{{ aap_credential_automationhub_name }}"
+      - Ansible Galaxy
+    assign_galaxy_credentials_to_org: True
+
+controller_projects:    
+  - name: "{{ aap_project_ocpv_name }}"
+    organization: "{{ aap_organization }}"
+    scm_type: git
+    scm_url: "{{ aap_project_ocpv_git_url }}"
+    scm_branch: "{{ aap_project_ocpv_git_branch }}"
+
+controller_inventories:
+  - name: "{{ aap_inventory_ocpv_name }}"
+    description: OpenShift Virtualization Inventory
+    organization: "{{ aap_organization }}"
+
+controller_hosts:
+  - name: localhost
+    inventory: "{{ aap_inventory_ocpv_name }}"
+    variables:
+      ansible_connection: local
+      ansible_python_interpreter: "{  { ansible_playbook_python }}"
+      k8s_discovered_resources:
+        - inventory_group_name: "{{ aap_inventory_ocpv_eap_name }}"
+          namespace: "{{ lab_namespace }}"
+          label_selectors:
+            - "kubevirt.io/domain={{ lab_name }}"
+controller_groups:
+  - name: "{{ aap_inventory_ocpv_eap_name }}"
+    inventory: "{{ aap_inventory_ocpv_name }}"
+
+controller_templates:
+  - name: Deploy OCPv
+    job_type: run
+    organization: "{{ aap_organization }}"
+    credentials:
+     - "{{ aap_credential_openshift_name }}"
+    project: "{{ aap_project_ocpv_name }}"
+    playbook: "{{ aap_template_deploy_ocp_playbook }}"
+    inventory: "{{ aap_inventory_ocpv_name }}"
+  - name: Deploy lab
+    job_type: run
+    organization: "{{ aap_organization }}"
+    credentials:
+     - "{{ aap_credential_openshift_name }}"
+     - "{{ aap_credential_jbossnetwork_name }}"
+     - "{{ aap_credential_machine_name }}"
+     - "{{ aap_credential_publickey_name }}"
+     - "{{ aap_credential_redhat_csp_name }}"
+    project: "{{ aap_project_ocpv_name }}"
+    playbook: "{{ aap_template_deploy_lab_playbook }}"
+    inventory: "{{ aap_inventory_ocpv_name }}"
+    extra_vars:
+      eap_archive_dir: /tmp/eap_archive/
+      eap_version: 7.4.0
+      eap_archive_filename: "jboss-eap-7.4.0.zip"
+      eap_download_location: "/tmp/eap_archive/jboss-eap-7.4.0.zip"

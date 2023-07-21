@@ -1,0 +1,26 @@
+---
+
+- name: Verify Required Parameters Specified
+  ansible.builtin.assert:
+    that:
+      - discovered_resource.inventory_group_name is defined and (discovered_resource.inventory_group_name|trim|length >0)
+    k8s_discovery_msg: "Required Parameters 'inventory_group_name` Not Provided"
+    quiet: true
+
+- name: Query k8s Resource
+  kubernetes.core.k8s_info:
+    kind: "{{ discovered_resource.kind | default('pod') }}"
+    api_version: "{{ discovered_resource.api_version | default('v1') }}"
+    namespace: "{{ discovered_resource.namespace | default(omit) }}"
+    name: "{{ discovered_resource.name | default(omit) }}"
+    field_selectors: "{{ discovered_resource.field_selectors | default(omit) }}"
+    label_selectors: "{{ discovered_resource.label_selectors | default(omit) }}"
+  register: k8s_discovery_queried_resources
+
+- name: Debug Kubernetes Query
+  ansible.builtin.set_fact:
+    k8s_discovery_msg: "{{ k8s_discovery_queried_resources }}"
+
+- name: Aggregate Queried Resources
+  ansible.builtin.set_fact:
+    k8s_discovery_combined_queried_resources: "{{ k8s_discovery_combined_queried_resources | default([]) + [{'discovered_resource': discovered_resource, 'resources': k8s_discovery_queried_resources.resources}] }}"

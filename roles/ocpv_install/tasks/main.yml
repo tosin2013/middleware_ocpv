@@ -1,0 +1,149 @@
+---
+# tasks file for ocpv_install
+- name: "Create Namespace {{ ocpv_namespace }}"
+  kubernetes.core.k8s:
+    state: present
+    api_version: v1
+    kind: Namespace
+    name: "{{ ocpv_namespace }}"
+
+- name: "Create OperatorGroup"
+  kubernetes.core.k8s:
+    state: present
+    template: operatorgroup.yml.j2
+
+- name: "Set subscription channel to provided channel"
+  when: ocpv_channel | default("") | length > 0
+  ansible.builtin.set_fact:
+    __ocpv_channel: "{{ ocpv_channel }}"
+
+- name: "Determine channel for the operator if no channel specified"
+  when: ocpv_channel | default("") | length == 0
+  block:
+  - name: Get cluster version
+    kubernetes.core.k8s_info:
+      api_version: config.openshift.io/v1
+      kind: ClusterVersion
+      name: version
+    register: ocpv_install_r_cluster_version
+
+  - name: "Get PackageManifest for the operator"
+    kubernetes.core.k8s_info:
+      api_version: packages.operators.coreos.com/v1
+      kind: PackageManifest
+      name: "{{ ocpv_operator_name }}"
+      namespace: "{{ ocpv_operator_catalog }}"
+    register: ocpv_install_r_packagemanifest
+
+  - name: "Set operator channel"
+    ansible.builtin.set_fact:
+      __ocpv_channel: "{{ ocpv_install_t_channel | regex_replace(' ') }}"
+    vars:
+      ocpv_install_t_cluster_version: >-
+        {{ ocpv_install_r_cluster_version.resources[0].spec.channel | regex_replace('.*-(\d+\.\d+)', '\1') }}
+      ocpv_install_t_version_match_query: "[?name=='{{ ocpv_install_t_cluster_version }}']|[0].name"
+      ocpv_install_t_version_match_channel: >-
+        {{ ocpv_install_r_packagemanifest.resources[0].status.channels | json_query(ocpv_install_t_version_match_query) }}
+      ocpv_install_t_channel: >-
+        {{ ocpv_install_t_version_match_channel | default(ocpv_install_r_packagemanifest.resources[0].status.defaultChannel, true) }}
+
+- name: "Print operator channel to be installed"
+  ansible.builtin.debug:
+    msg: "Operator channel to be installed: {{ __ocpv_channel }}"
+
+- name: "Create Subscription"
+  kubernetes.core.k8s:
+    state: present
+    template: subscription.yml.j2
+
+- name: "Wait until InstallPlan is created"
+  kubernetes.core.k8s_info:
+    api_version: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    namespace: "{{ ocpv_namespace }}"
+  register: ocpv_install_r_install_plans
+  vars:
+    ocpv_install_query: >-
+      [?starts_with(spec.clusterServiceVersionNames[0], '{{ ocpv_operator_name }}') && status.phase ]
+  retries: 30
+  delay: 10
+  until:
+  - ocpv_install_r_install_plans.resources | length > 0
+  - ocpv_install_r_install_plans.resources | to_json | from_json | json_query(ocpv_install_query)
+
+- name: "Set InstallPlan name"
+  ansible.builtin.set_fact:
+    ocpv_install_plan_name: "{{ ocpv_install_r_install_plans.resources | to_json | from_json | json_query(ocpv_install_name_query) }}"
+  vars:
+    ocpv_install_name_query: >-
+      [?starts_with(spec.clusterServiceVersionNames[0], '{{ ocpv_operator_name }}' )].metadata.name|[0]
+- name: "Get InstallPlan"
+  kubernetes.core.k8s_info:
+    api_version: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    name: "{{ ocpv_install_plan_name }}"
+    namespace: "{{ ocpv_namespace }}"
+  register: ocpv_install_r_install_plan
+
+- name: "Approve InstallPlan if necessary"
+  when: ocpv_install_r_install_plan.resources[0].status.phase is match("RequiresApproval")
+  kubernetes.core.k8s:
+    state: present
+    template: "installplan.yml.j2"
+
+- name: "Get Installed CSV"
+  kubernetes.core.k8s_info:
+    api_version: operators.coreos.com/v1alpha1
+    kind: Subscription
+    name: "{{ ocpv_operator_name }}"
+    namespace: "{{ ocpv_namespace }}"
+  register: ocpv_install_r_subscription
+  retries: 30
+  delay: 10
+  until:
+  - ocpv_install_r_subscription.resources[0].status.currentCSV is defined
+  - ocpv_install_r_subscription.resources[0].status.currentCSV | length > 0
+
+- name: "Print CSV version to be installed"
+  when: install_operator_starting_csv is defined
+  ansible.builtin.debug:
+    msg: "Starting CSV: {{ install_operator_starting_csv }}"
+
+- name: "Wait until CSV is installed"
+  kubernetes.core.k8s_info:
+    api_version: operators.coreos.com/v1alpha1
+    kind: ClusterServiceVersion
+    name: "{{ ocpv_install_r_subscription.resources[0].status.currentCSV }}"
+    namespace: "{{ ocpv_namespace }}"
+  register: ocpv_install_r_csv
+  retries: 40
+  delay: 30
+  until:
+  - ocpv_install_r_csv.resources[0].status.phase is defined
+  - ocpv_install_r_csv.resources[0].status.phase | length > 0
+  - ocpv_install_r_csv.resources[0].status.phase == "Succeeded"
+  ignore_errors: "{{ ocpv_csv_ignore_error }}"
+
+- name: Create the HyperConverged instance
+  kubernetes.core.k8s:
+    state: present
+    template: "hyperconverged.yml.j2"
+
+- name: Wait until HyperConverged is installed
+  kubernetes.core.k8s_info:
+    api_version: hco.kubevirt.io/v1beta1
+    kind: HyperConverged
+    name: kubevirt-hyperconverged
+    namespace: openshift-cnv
+  register: ocpv_install_r_hyperconverged
+  retries: 120
+  delay: 10
+  until:
+  - ocpv_install_r_hyperconverged.resources is defined
+  - ocpv_install_r_hyperconverged.resources | length > 0
+  - ocpv_install_r_hyperconverged.resources[0].status is defined
+  - ocpv_install_r_hyperconverged.resources[0].status.conditions | length > 0
+  - ocpv_install_r_hyperconverged.resources[0].status.conditions | json_query( ocpv_install_hyperconverged_query ) | bool
+  vars:
+    ocpv_install_hyperconverged_query: >-
+      [?type=='Available'].status[] | [0]

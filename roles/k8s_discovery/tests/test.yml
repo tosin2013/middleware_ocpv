@@ -1,0 +1,6 @@
+---
+- name: Test for k8s_discovery role
+  hosts: localhost
+  remote_user: root
+  roles:
+    - k8s_discovery

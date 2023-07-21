@@ -122,4 +122,4 @@ Enjoy seeing the power of Ansible Middleware setup, configure and automate the d
 
 # License
 
-[Apache License Version 2.0](https://github.com/ansible-middleware/ocpv-lab/blob/main/LICENSE)
+[Apache License Version 2.0](https://github.com/ansible-middleware/ocpv_lab/blob/main/LICENSE)

@@ -1,0 +1,75 @@
+---
+
+- name: Verified Required AAP Variables Provided
+  ansible.builtin.assert:
+    that:
+      - controller_hostname is defined
+      - controller_hostname | length > 0
+      - controller_username is defined
+      - controller_username | length > 0
+      - controller_password is defined
+      - controller_password | length > 0
+      - ssh_public_key_path is defined
+      - ssh_public_key_path | length > 0
+      - ssh_private_key_path is defined
+      - ssh_private_key_path | length > 0
+      - automationhub_token is defined
+      - automationhub_token | length > 0
+      - jbossnetwork_client_id is defined
+      - jbossnetwork_client_id | length > 0
+      - jbossnetwork_client_secret is defined
+      - jbossnetwork_client_secret | length > 0
+      - redhat_csp_username is defined
+      - redhat_csp_username | length > 0
+      - redhat_csp_password is defined
+      - redhat_csp_password | length > 0
+    fail_msg: "Required Parameters not Provided"
+    quiet: true
+
+- name: Check if SSH Public Key exists
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  failed_when: not configure_aap_ssh_stat.stat.exists
+  register: configure_aap_ssh_stat
+  loop:
+    - "{{ ssh_private_key_path }}"
+    - "{{ ssh_public_key_path }}"
+
+- name: Complete Prerequisites
+  ansible.builtin.include_tasks: prereqs.yml
+
+- name: Load Controller Variables
+  ansible.builtin.include_vars:
+    file: "vars/controller-configuration.yml"
+
+- name: Configure Credential Types
+  ansible.builtin.include_role:
+    name: redhat_cop.controller_configuration.credential_types
+
+- name: Configure Credentials
+  ansible.builtin.include_role:
+    name: redhat_cop.controller_configuration.credentials
+
+- name: Configure Organizations
+  ansible.builtin.include_role:
+    name: redhat_cop.controller_configuration.organizations
+
+- name: Configure Projects
+  ansible.builtin.include_role:
+    name: redhat_cop.controller_configuration.projects
+
+- name: Configure Inventories
+  ansible.builtin.include_role:
+    name: redhat_cop.controller_configuration.inventories
+
+- name: Configure Hosts
+  ansible.builtin.include_role:
+    name: redhat_cop.controller_configuration.hosts
+
+- name: Configure Groups
+  ansible.builtin.include_role:
+    name: redhat_cop.controller_configuration.groups
+
+- name: Configure Job Templates
+  ansible.builtin.include_role:
+    name: redhat_cop.controller_configuration.job_templates

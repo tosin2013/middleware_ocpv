@@ -1,0 +1,13 @@
+---
+
+- name: Discover Resources
+  ansible.builtin.include_tasks: discover_resource.yml
+  loop_control:
+    loop_var: discovered_resource
+  loop: "{{ k8s_discovered_resources }}"
+
+- name: Add Hosts
+  ansible.builtin.include_tasks: add_host.yml
+  loop_control:
+    loop_var: queried_resource
+  loop: "{{ k8s_discovery_combined_queried_resources | default([]) }}"

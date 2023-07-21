@@ -1,0 +1,18 @@
+---
+- name: Dynamic discovery of VirtualMachine instances
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: K8s Discovery
+      ansible.builtin.include_role:
+        name: k8s-discovery
+    - name: Debug
+      ansible.builtin.debug:
+        msg: "{{ groups }}"
+
+- name: EAP  
+  hosts: eap
+  tasks:
+    - name: Print OS Version
+      ansible.builtin.debug:
+        msg: "{{ lookup('file', '/etc/redhat-release') }}"

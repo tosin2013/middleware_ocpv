@@ -1,0 +1,35 @@
+namespace: middleware_automation
+name: ocpv_lab
+version: "1.0.0"
+readme: README.md
+authors:
+  - Andrew Block <ablock@redhat.com>
+  - Guido Grazioli <ggraziol@redhat.com>
+  - Ranabir Chakraborty <rchakrab@redhat.com>
+description: Using OpenShift Virtualization as an environment for hosting Virtual Machines that are provisioned, configured and maintained using Ansible and tooling from the Ansible Middleware project.
+license_file: "LICENSE"
+tags:
+  - java
+  - ansible
+  - server
+  - application
+  - kubernetes
+  - openshift
+  - runtimes
+  - middleware
+  - a4mw
+dependencies:
+  ansible.posix: '>=1.4.0'
+  kubernetes.core: '>=2.4.0'
+repository: https://github.com/ansible-middleware/ocpv_lab
+homepage: https://github.com/ansible-middleware/ocpv_lab
+issues: https://github.com/ansible-middleware/ocpv_lab/issues
+build_ignore:
+  - .gitignore
+  - .github
+  - .ansible-lint
+  - .yamllint
+  - '*.tar.gz'
+  - '*.zip'
+  - molecule
+  - changelogs

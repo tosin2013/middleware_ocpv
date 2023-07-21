@@ -1,0 +1,6 @@
+---
+- name: Test of configure_aap role
+  hosts: localhost
+  remote_user: root
+  roles:
+    - configure_aap

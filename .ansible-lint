@@ -37,6 +37,7 @@ warn_list:
   - no-changed-when
   - key-order[task]
   - var-naming[no-role-prefix]
+  - yaml[empty-lines]
 
 use_default_rules: true
 parseable: true

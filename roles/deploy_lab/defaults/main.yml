@@ -1,0 +1,31 @@
+---
+# defaults file for deploy_lab
+
+lab_namespace: ansible-middleware-ocpv
+lab_name: eap-lab
+vm_cpus_cores: 2
+vm_cpus_sockets: 1
+vm_cpus_threads: 1
+vm_machine_type: pc-q35-rhel8.4.0
+vm_storage_requests: 50Gi
+vm_memory_requests: 8Gi
+vm_datasource_name: rhel9
+vm_datasource_namespace: openshift-virtualization-os-images
+deploy_lab_vm_ssh_public_key: ""
+cloud_init_secret: cloud-init
+
+eap_product_version: 7.4
+eap_version: 7.4.0
+eap_product_category: appplatform
+eap_product_type: DISTRIBUTION
+eap_product_filename: 'jboss-eap-7.4.0.zip$'
+
+eap_java_package_name: java-11-openjdk-headless.x86_64
+eap_archive_dir: /tmp/eap_archive/
+eap_archive_filename: "jboss-eap-{{ eap_version }}.zip"
+eap_download_location: "{{ eap_archive_dir }}{{ eap_archive_filename }}"
+eap_bind_addr: 0.0.0.0
+
+app:
+  name: 'info-1.1.war'
+  url: 'https://drive.google.com/uc?export=download&id=1w9ss5okctnjUvRAxhPEPyC7DmbUwmbhb'

@@ -1,0 +1,13 @@
+---
+
+- name: Debug Queried Resource
+  ansible.builtin.set_fact:
+    k8s_discovery_msg: "{{ queried_resource }}"
+
+- name: Add host (Pods)
+  ansible.builtin.add_host:
+    name: "{{ item.metadata.name }}"
+    groups: "{{ queried_resource.discovered_resource.inventory_group_name }}"
+    ansible_host: "{{ item.status.podIP }}"
+  loop: "{{ queried_resource.resources }}"
+  when: item.kind == "Pod" and item.status.phase == "Running"

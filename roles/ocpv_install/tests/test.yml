@@ -1,0 +1,6 @@
+---
+- name: Test for ocpv_install role
+  hosts: localhost
+  remote_user: root
+  roles:
+    - ocpv_install
