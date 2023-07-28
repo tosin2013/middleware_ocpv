@@ -4,4 +4,4 @@ collections:
   - name: kubernetes.core
     version: 2.4.0
   - name: ansible.controller
-  - name: redhat_cop.controller_configuration
+  - name: infra.controller_configuration

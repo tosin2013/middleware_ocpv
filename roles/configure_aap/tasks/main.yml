@@ -44,32 +44,32 @@
 
 - name: Configure Credential Types
   ansible.builtin.include_role:
-    name: redhat_cop.controller_configuration.credential_types
+    name: infra.controller_configuration.credential_types
 
 - name: Configure Credentials
   ansible.builtin.include_role:
-    name: redhat_cop.controller_configuration.credentials
+    name: infra.controller_configuration.credentials
 
 - name: Configure Organizations
   ansible.builtin.include_role:
-    name: redhat_cop.controller_configuration.organizations
+    name: infra.controller_configuration.organizations
 
 - name: Configure Projects
   ansible.builtin.include_role:
-    name: redhat_cop.controller_configuration.projects
+    name: infra.controller_configuration.projects
 
 - name: Configure Inventories
   ansible.builtin.include_role:
-    name: redhat_cop.controller_configuration.inventories
+    name: infra.controller_configuration.inventories
 
 - name: Configure Hosts
   ansible.builtin.include_role:
-    name: redhat_cop.controller_configuration.hosts
+    name: infra.controller_configuration.hosts
 
 - name: Configure Groups
   ansible.builtin.include_role:
-    name: redhat_cop.controller_configuration.groups
+    name: infra.controller_configuration.groups
 
 - name: Configure Job Templates
   ansible.builtin.include_role:
-    name: redhat_cop.controller_configuration.job_templates
+    name: infra.controller_configuration.job_templates

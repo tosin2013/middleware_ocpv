@@ -9,4 +9,4 @@
 
     - name: Configure AAP
       ansible.builtin.include_role:
-        name: redhat_cop.controller_configuration.configure_aap
+        name: infra.controller_configuration.configure_aap

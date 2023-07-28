@@ -17,7 +17,7 @@ Dependencies
 
 * [kubernetes.core](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/index.html)
 * [ansible.controller](https://docs.ansible.com/automation.html)
-* [redhat_cop.controller_configuration](https://galaxy.ansible.com/redhat_cop)
+* [infra.controller_configuration](https://galaxy.ansible.com/infra)
 
 Example Playbook
 ----------------
