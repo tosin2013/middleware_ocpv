@@ -25,6 +25,7 @@ repository: https://github.com/ansible-middleware/ocpv_lab
 homepage: https://github.com/ansible-middleware/ocpv_lab
 issues: https://github.com/ansible-middleware/ocpv_lab/issues
 build_ignore:
+  - collections
   - .gitignore
   - .github
   - .ansible-lint
