@@ -1,12 +1,4 @@
 # .ansible-lint
-exclude_paths:
-  - .cache/
-  - .github/
-  - molecule/
-  - docs/
-  - .ansible-lint
-  - .yamllint
-  - playbooks/roles/
 
 rulesdir:
    - ../../ansible-lint-custom-rules/rules/
