@@ -2,6 +2,12 @@
 
 Using OpenShift Virtualization as an environment for hosting Virtual Machines that are provisioned, configured and maintained using Ansible and tooling from the Ansible Middleware project.
 
+## Use case of ocpv_lab
+
+The `middleware_automation.ocpv_lab` collection demonstrates the use of Ansible automation to manage both the lifecycle of Virtual Machines within an OpenShift Virtualization runtime environment as well as the installation, configuration and management of deployed instances with JBoss Enterprise Application Server (EAP).
+
+The integration with OpenShift Virtualization illustrates how Virtual Machines within this dynamic and scalable environment can be managed similarly as other hosting environment and as Red Hat Application Services instances are a common type of workload, the use of Ansible automation showcases just how easy it is to deploy and manage an entire fleet of instances.
+
 ## Environment Requirements
 
 For this lab, the following resources must be available:
