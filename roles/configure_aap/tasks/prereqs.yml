@@ -1,5 +1,17 @@
 ---
 
+# if {{ kubeconfig_path }} does not exist fail
+- name: Check if kubeconfig exists
+  stat:
+    path: "{{ kubeconfig_path }}"
+  register: kubeconfig_exists
+
+# if kubeconfig_exists does not exist fail
+- name: Fail if kubeconfig does not exist
+  fail:
+    msg: "Kubeconfig does not exist"
+  when: not kubeconfig_exists.stat.exists
+
 - name: Create ServiceAccount for Controller
   kubernetes.core.k8s:
     state: present
@@ -9,9 +21,11 @@
       metadata:
         name: "{{ aap_openshift_serviceaccount_name }}"
         namespace: "{{ aap_controller_namespace }}"
+    kubeconfig: "{{ kubeconfig_path }}"
 
 - name: Create ClusterRoleBinding for Controller
   kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_path }}"
     state: present
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
@@ -29,6 +43,7 @@
 
 - name: "Create Service Account Token for ServiceAccount"
   kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_path }}"
     state: present
     definition:
       kind: Secret
@@ -41,6 +56,7 @@
 
 - name: "Obtain Token for ServiceAccount"
   kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig_path }}"
     kind: Secret
     name: "{{ aap_openshift_serviceaccount_token_name }}"
     namespace: "{{ aap_controller_namespace }}"

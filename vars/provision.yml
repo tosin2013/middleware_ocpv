@@ -15,3 +15,9 @@ controller_hostname: ""
 controller_username: ""
 controller_password: ""
 controller_validate_certs: false
+
+aap_controller_namespace: aap
+
+kubeconfig_path: "/home/changeme/.kube/config"
+
+aap_project_ocpv_git_url: https://github.com/tosin2013/middleware_ocpv.git
