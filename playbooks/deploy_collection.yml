@@ -1,0 +1,13 @@
+---
+- name: Deploy Collection
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Include vars
+      ansible.builtin.include_vars: "{{ playbook_dir }}/../vars/{{ provision_var_file | default('provision.yml') }}"
+
+    - name: Deploy Collection
+      ansible.builtin.include_role:
+        name: deploy_collection
+ 
