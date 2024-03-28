@@ -2,3 +2,6 @@
 # Keep it blank as of now
 # Just to avoid the error/warning 
 # We are commenting few lines.
+ - name: Configure VM no OCP
+   include_tasks: configure-ocp.yml
+   when: configure_ocp is defined and configure_ocp
