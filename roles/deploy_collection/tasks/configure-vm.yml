@@ -55,14 +55,14 @@
   ansible.builtin.command: subscription-manager status
   register: sm_result
   ignore_errors: True
-  no_changed_when: True
+  changed_when: False
 
 - name: Subscribe to RHN
   become: true
   ansible.builtin.command: subscription-manager register --username="{{ redhat_portal_username }}" --password="{{ redhat_portal_password }}" --force
   no_log: true
   when: sm_result.rc != 0
-  no_changed_when: True
+  changed_when: True
 
 - name: Install EAP
   ansible.builtin.include_role:
