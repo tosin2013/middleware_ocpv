@@ -2,5 +2,7 @@
 # Keep it blank as of now
 # Just to avoid the error/warning 
 # We are commenting few lines.
+- name:  Deploy VM on OCP
+  include_tasks: configure-ocp.yml
 - name: Configure VM on OCP
   include_tasks: configure-vm.yml
