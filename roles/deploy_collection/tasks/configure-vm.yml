@@ -51,7 +51,7 @@
     dest: "{{ eap_download_location }}"
 
 - name: Check RHN subscription status
-  become: true
+  become: false
   ansible.builtin.command: subscription-manager status
   register: sm_result
   ignore_errors: True
