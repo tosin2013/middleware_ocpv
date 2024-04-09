@@ -1,9 +1,9 @@
-- name: Display IP Address
-  ansible.builtin.debug:
-    msg: "IP Address: {{ vm_ip_address }}"
-- name: Display VM Name
-  ansible.builtin.debug:
-    msg: "VM Name: {{ vm_name }}"
+- name: Display IP address, machine name, and OS
+  debug:
+    msg: |
+      The IP address of this host is {{ ansible_default_ipv4.address }}
+      The machine name of this host is {{ ansible_hostname }}
+      The operating system of this host is {{ ansible_os_family }}
 
 - name: Verify Client ID and Secret provided 
   ansible.builtin.assert:
