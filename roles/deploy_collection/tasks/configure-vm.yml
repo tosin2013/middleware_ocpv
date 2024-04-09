@@ -4,6 +4,7 @@
       The IP address of this host is {{ ansible_default_ipv4.address }}
       The machine name of this host is {{ ansible_hostname }}
       The operating system of this host is {{ ansible_os_family }}
+  tags: configure-vm
 
 - name: Verify Client ID and Secret provided 
   ansible.builtin.assert:
@@ -14,6 +15,7 @@
       - redhat_serviceaccount_client_secret | length > 0
     fail_msg: "'redhat_serviceaccount_client_id' and 'redhat_serviceaccount_client_secret' are not defined"
     quiet: true
+  tags: configure-vm
 
 - name: Verify RHN Credentials Provided 
   ansible.builtin.assert:
@@ -24,12 +26,14 @@
       - redhat_portal_password | length > 0
     fail_msg: "'redhat_portal_username' and 'redhat_portal_password' are not defined"
     quiet: true
+  tags: configure-vm
 
 - name: Create Download Archive Directory
   ansible.builtin.file:
     state: directory
     path: "{{ eap_archive_dir }}"
     mode: 0644
+  tags: configure-vm
 
 - name: Search EAP Products
   middleware_automation.common.product_search:
@@ -39,15 +43,18 @@
     product_version: "{{ eap_product_version }}"
     product_type: "{{ eap_product_type }}"
   register: deploy_collection_product_results
+  tags: configure-vm
 
 - name: Filter Products
   ansible.builtin.set_fact:
     deploy_collection_filtered_products: "{{ deploy_collection_product_results.results | selectattr('file_path', 'search', eap_product_filename) | list }}"
+  tags: configure-vm
 
 - name: Fail if 1 single product is in the filtered list
   ansible.builtin.fail:
     msg: "Unable to locate single product to download: {{ deploy_collection_filtered_products | length }} products found"
   when: deploy_collection_filtered_products | length != 1
+  tags: configure-vm
 
 - name: Download EAP
   become: false
@@ -56,6 +63,7 @@
     client_secret: "{{ redhat_serviceaccount_client_secret }}"
     product_id: "{{ (deploy_collection_filtered_products | first).id }}"
     dest: "{{ eap_download_location }}"
+  tags: configure-vm
 
 - name: Check RHN subscription status
   become: false
@@ -63,6 +71,7 @@
   register: sm_result
   ignore_errors: True
   changed_when: False
+  tags: configure-vm
 
 - name: Subscribe to RHN
   become: true
@@ -70,18 +79,22 @@
   no_log: true
   when: sm_result.rc != 0
   changed_when: True
+  tags: configure-vm
 
 - name: Install EAP
   ansible.builtin.include_role:
     name: redhat.eap.eap_install
+  tags: configure-vm
 
 - name: "Set up EAP"
   ansible.builtin.include_role:
     name: redhat.eap.eap_systemd
+  tags: configure-vm
 
 - name: "Wait for each instance HTTP ports to become available."
   ansible.builtin.wait_for:
     port: 8080
+  tags: configure-vm
 
 - name: "Ensures webapp has been retrieved from {{ app.url }}"
   become: true
@@ -89,6 +102,7 @@
     url: "{{ app.url }}"
     dest: "{{ eap_archive_dir }}/{{ app.name }}"
     mode: 0644
+  tags: configure-vm
 
 - name: "Deploy webapp"
   ansible.builtin.include_role:
@@ -98,3 +112,4 @@
       become: true
   vars:
     jboss_cli_query: "'deploy --force {{ eap_archive_dir }}/{{ app.name }}'" # noqa: var-naming[no-role-prefix]
+  tags: configure-vm

@@ -1,13 +1,12 @@
----
 - name: Deploy Collection
-  hosts: localhost
-  gather_facts: true
-  connection: local
+  hosts: eap-collection
+  gather_facts: false
   tasks:
     - name: Include vars
       ansible.builtin.include_vars: "{{ playbook_dir }}/../vars/{{ provision_var_file | default('provision.yml') }}"
 
-    - name: Deploy Collection
+    - name: Call task from role
       ansible.builtin.include_role:
         name: deploy_collection
-      tags: configure-ocp
+      tags: configure-vm
+ 
