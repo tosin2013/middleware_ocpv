@@ -1,5 +1,5 @@
 - name: Deploy Collection
-  hosts: eap-collection
+  hosts: all
   gather_facts: false
   tasks:
     - name: Include vars
