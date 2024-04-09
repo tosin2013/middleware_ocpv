@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: eap-collection
   gather_facts: yes
   tasks:
     - name: Display IP address, machine name, and OS
