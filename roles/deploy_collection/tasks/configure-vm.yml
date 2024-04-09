@@ -1,3 +1,10 @@
+- name: Display IP Address
+  ansible.builtin.debug:
+    msg: "IP Address: {{ vm_ip_address }}"
+- name: Display VM Name
+  ansible.builtin.debug:
+    msg: "VM Name: {{ vm_name }}"
+
 - name: Verify Client ID and Secret provided 
   ansible.builtin.assert:
     that:
