@@ -49,7 +49,7 @@
   tags: configure-vm
 
 - name: Download EAP
-  become: false
+  become: true
   middleware_automation.common.product_download:
     client_id: "{{ redhat_serviceaccount_client_id }}"
     client_secret: "{{ redhat_serviceaccount_client_secret }}"
@@ -58,7 +58,7 @@
   tags: configure-vm
 
 - name: Check RHN subscription status
-  become: false
+  become: true
   ansible.builtin.command: subscription-manager status
   register: sm_result
   ignore_errors: True
