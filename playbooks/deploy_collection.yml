@@ -1,8 +1,7 @@
 ---
 - name: Deploy Collection
-  hosts: localhost
+  hosts: eap-collection
   gather_facts: false
-  connection: local
   tasks:
     - name: Include vars
       ansible.builtin.include_vars: "{{ playbook_dir }}/../vars/{{ provision_var_file | default('provision.yml') }}"
