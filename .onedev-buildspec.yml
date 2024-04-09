@@ -1,0 +1,336 @@
+version: 30
+jobs:
+- name: Test middleware_ocpv
+  jobExecutor: default-executor
+  steps:
+  - !CommandStep
+    name: Download middleware_ocpv
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands: "if [ ! -d /opt/middleware_ocpv ];\nthen \n  cd /opt/\n  git clone @param:GIT_REPO@\n  cd /opt/middleware_ocpv\n  mkdir -p ~/.ansible/roles/\n  sudo ln -s /opt/middleware_ocpv ~/.ansible/roles/\n  pip3 install -r requirements.txt\n  #ansible-galaxy install -r requirements.yml\nelse\n  cd /opt/middleware_ocpv\n  git pull\n  pip3 install -r requirements.txt\n  #ansible-galaxy install -r requirements.yml\nfi\n"
+    useTTY: true
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: Configure Inventory File
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands: |
+        cd /opt/middleware_ocpv
+        cat >vars/provision.yml<<EOF
+        ---
+        ssh_private_key_path: "@param:SSH_PRIVATE_KEY_PATH@"
+        ssh_public_key_path: "@param:SSH_PUBLIC_KEY_PATH@"
+
+        automationhub_token: CHANGEME-OFFLINE-TOKEN
+
+        #"@param:AUTOMATIONHUB_TOKEN@"
+
+        jbossnetwork_client_id: "@param:JBOSSNETWORK_CLIENT_ID@"
+        jbossnetwork_client_secret: "@param:JBOSSNETWORK_CLIENT_SECRET@"
+
+        redhat_csp_username: "@param:REDHAT_CSP_USERNAME@"
+        redhat_csp_password: "@param:REDHAT_CSP_PASSWORD@"
+
+        controller_hostname: "@param:CONTROLLER_HOSTNAME@"
+        controller_username: "@param:CONTROLLER_USERNAME@"
+        controller_password: "@param:CONTROLLER_PASSWORD@"
+        controller_validate_certs: @param:CONTROLLER_VALIDATE_CERTS@
+
+        aap_controller_namespace: @param:AAP_CONTROLLER_NAMESPACE@
+
+        kubeconfig_path: @param:KUBECONFIG_PATH@
+
+        aap_project_ocpv_git_url: @param:AAP_PROJECT_OCPV_GIT_URL@
+        EOF
+
+        cat vars/provision.yml
+
+        sed -i 's/token=.*/token=@param:AUTOMATIONHUB_TOKEN@/g' ansible.cfg
+        cat ansible.cfg
+    useTTY: true
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: Configure AAP
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands: |
+        cd /opt/middleware_ocpv
+        ansible-galaxy collection install -r requirements.yml
+        ansible-playbook playbooks/provision.yml
+    useTTY: true
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: Install OpenShift Virtualization
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands: |
+        cd /opt/middleware_ocpv
+        oc login --token=@param:OPENSHIFT_TOKEN@ --server=@param:OPENSHIFT_URL@
+        #ansible-playbook playbooks/install_ocpv.yml
+    useTTY: true
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  paramSpecs:
+  - !TextParam
+    name: GIT_REPO
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: https://github.com/tosin2013/middleware_ocpv.git
+  - !TextParam
+    name: VERBOSE_LEVEL
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: -v
+  - !TextParam
+    name: SSH_PRIVATE_KEY_PATH
+    description: SSH_PRIVATE_KEY_PATH
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: /home/lab-user/.ssh/id_rsa
+  - !TextParam
+    name: SSH_PUBLIC_KEY_PATH
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: /home/lab-user/.ssh/id_rsa.pub
+  - !SecretParam
+    name: AUTOMATIONHUB_TOKEN
+    description: "Steps for obtaining the token can be found\r\nhttps://cloud.redhat.com/ansible/automation-hub/token/"
+  - !TextParam
+    name: JBOSSNETWORK_CLIENT_ID
+    description: "Obtain a Client ID and Client Secret by generating a Service Account\r\nhttps://console.redhat.com/application-services/service-accounts\r\n"
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: UUID
+  - !SecretParam
+    name: JBOSSNETWORK_CLIENT_SECRET
+    description: "Obtain a Client ID and Client Secret by generating a Service Account\r\nhttps://console.redhat.com/application-services/service-accounts"
+  - !TextParam
+    name: REDHAT_CSP_USERNAME
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: username@redhat.com
+  - !SecretParam
+    name: REDHAT_CSP_PASSWORD
+  - !TextParam
+    name: CONTROLLER_HOSTNAME
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: controller-aap.apps.lab.example.com
+  - !TextParam
+    name: CONTROLLER_USERNAME
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: admin
+  - !SecretParam
+    name: CONTROLLER_PASSWORD
+  - !ChoiceParam
+    name: CONTROLLER_VALIDATE_CERTS
+    allowMultiple: false
+    allowEmpty: false
+    choiceProvider: !SpecifiedChoices
+      choices:
+      - value: 'true'
+        color: '#0d87e9'
+      - value: 'false'
+        color: '#0d87e9'
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: 'false'
+  - !TextParam
+    name: AAP_CONTROLLER_NAMESPACE
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: aap
+  - !TextParam
+    name: KUBECONFIG_PATH
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: '"/home/remoteuser/.kube/config"'
+  - !TextParam
+    name: AAP_PROJECT_OCPV_GIT_URL
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: https://github.com/tosin2013/middleware_ocpv.git
+  - !TextParam
+    name: OPENSHIFT_URL
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: https://api.lab.example.com:6443
+  - !SecretParam
+    name: OPENSHIFT_TOKEN
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+- name: Deploy Collection
+  jobExecutor: default-executor
+  steps:
+  - !CommandStep
+    name: Download middleware_ocpv
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands: "if [ ! -d /opt/middleware_ocpv ];\nthen \n  cd /opt/\n  git clone @param:GIT_REPO@\n  cd /opt/middleware_ocpv\n  mkdir -p ~/.ansible/roles/\n  sudo ln -s /opt/middleware_ocpv ~/.ansible/roles/\n  pip3 install -r requirements.txt\n  #ansible-galaxy install -r requirements.yml\nelse\n  cd /opt/middleware_ocpv\n  git pull\n  pip3 install -r requirements.txt\n  #ansible-galaxy install -r requirements.yml\nfi\n"
+    useTTY: true
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: Configure Inventory File
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands: |
+        cd /opt/middleware_ocpv
+        cat >vars/provision.yml<<EOF
+        ---
+        ssh_private_key_path: "@param:SSH_PRIVATE_KEY_PATH@"
+        ssh_public_key_path: "@param:SSH_PUBLIC_KEY_PATH@"
+
+        automationhub_token: CHANGEME-OFFLINE-TOKEN
+
+        #"@param:AUTOMATIONHUB_TOKEN@"
+
+        jbossnetwork_client_id: "@param:JBOSSNETWORK_CLIENT_ID@"
+        jbossnetwork_client_secret: "@param:JBOSSNETWORK_CLIENT_SECRET@"
+        redhat_serviceaccount_client_id:  "@param:JBOSSNETWORK_CLIENT_ID@"
+        redhat_serviceaccount_client_secret: "@param:JBOSSNETWORK_CLIENT_SECRET@"
+        rhn_username: "@param:JBOSSNETWORK_CLIENT_ID@"
+        rhn_password:  "@param:JBOSSNETWORK_CLIENT_SECRET@"
+
+        redhat_csp_username: "@param:REDHAT_CSP_USERNAME@"
+        redhat_csp_password: "@param:REDHAT_CSP_PASSWORD@"
+        redhat_portal_username: "@param:REDHAT_CSP_USERNAME@"
+        redhat_portal_password: "@param:REDHAT_CSP_PASSWORD@"
+
+
+        controller_hostname: "@param:CONTROLLER_HOSTNAME@"
+        controller_username: "@param:CONTROLLER_USERNAME@"
+        controller_password: "@param:CONTROLLER_PASSWORD@"
+        controller_validate_certs: @param:CONTROLLER_VALIDATE_CERTS@
+
+        aap_controller_namespace: @param:AAP_CONTROLLER_NAMESPACE@
+
+        aap_project_ocpv_git_url: @param:AAP_PROJECT_OCPV_GIT_URL@
+        eap_enable: true
+        ansible_os_family: 'RedHat'
+        EOF
+
+        cat vars/provision.yml
+
+        sed -i 's/token=.*/token=@param:AUTOMATIONHUB_TOKEN@/g' ansible.cfg
+        cat ansible.cfg
+
+        whoami
+        cat >inventory<<EOF
+        [eap-collection]
+        192.168.100.11 ansible_user=cloud-user ansible_ssh_private_key_file=/home/lab-user/.ssh/id_rsa ansible_port=31326
+        EOF
+        ansible -i inventory eap-collection -m ping
+    useTTY: true
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: Configure AAP
+    runInContainer: false
+    interpreter: !DefaultInterpreter
+      commands: |
+        cd /opt/middleware_ocpv
+        ansible-galaxy collection install -r requirements.yml
+        ansible-playbook -i inventory playbooks/deploy_collection.yml @param:VERBOSE_LEVEL@
+    useTTY: true
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  paramSpecs:
+  - !TextParam
+    name: GIT_REPO
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: https://github.com/tosin2013/middleware_ocpv.git
+  - !TextParam
+    name: VERBOSE_LEVEL
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: -vvv
+  - !TextParam
+    name: SSH_PRIVATE_KEY_PATH
+    description: SSH_PRIVATE_KEY_PATH
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: /home/lab-user/.ssh/id_rsa
+  - !TextParam
+    name: SSH_PUBLIC_KEY_PATH
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: /home/lab-user/.ssh/id_rsa.pub
+  - !SecretParam
+    name: AUTOMATIONHUB_TOKEN
+    description: "Steps for obtaining the token can be found\r\nhttps://cloud.redhat.com/ansible/automation-hub/token/\r\n"
+  - !TextParam
+    name: JBOSSNETWORK_CLIENT_ID
+    description: "Obtain a Client ID and Client Secret by generating a Service Account\r\nhttps://console.redhat.com/application-services/service-accounts\r\n"
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: UUID
+  - !SecretParam
+    name: JBOSSNETWORK_CLIENT_SECRET
+    description: "Obtain a Client ID and Client Secret by generating a Service Account\r\nhttps://console.redhat.com/application-services/service-accounts"
+  - !TextParam
+    name: REDHAT_CSP_USERNAME
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: username@redhat.com
+  - !SecretParam
+    name: REDHAT_CSP_PASSWORD
+  - !TextParam
+    name: CONTROLLER_HOSTNAME
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: controller-aap.apps.lab.example.com
+  - !TextParam
+    name: CONTROLLER_USERNAME
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: admin
+  - !SecretParam
+    name: CONTROLLER_PASSWORD
+  - !ChoiceParam
+    name: CONTROLLER_VALIDATE_CERTS
+    allowMultiple: false
+    allowEmpty: false
+    choiceProvider: !SpecifiedChoices
+      choices:
+      - value: 'true'
+        color: '#0d87e9'
+      - value: 'false'
+        color: '#0d87e9'
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: 'false'
+  - !TextParam
+    name: AAP_CONTROLLER_NAMESPACE
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: aap
+  - !TextParam
+    name: AAP_PROJECT_OCPV_GIT_URL
+    allowEmpty: false
+    multiline: false
+    defaultValueProvider: !SpecifiedDefaultValue
+      value: https://github.com/tosin2013/middleware_ocpv.git
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
