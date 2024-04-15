@@ -1,6 +1,6 @@
 version: 30
 jobs:
-- name: Test middleware_ocpv
+- name: Configure Enviornment
   jobExecutor: default-executor
   steps:
   - !CommandStep
