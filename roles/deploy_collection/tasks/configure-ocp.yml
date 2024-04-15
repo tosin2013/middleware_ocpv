@@ -1,5 +1,4 @@
 ---
-
 - name: "Create Namespace {{ collection_namespace }}"
   kubernetes.core.k8s:
     state: present
@@ -17,7 +16,6 @@
       - deploy_collection_vm_ssh_public_key | length > 0
     fail_msg: "'deploy_collection_vm_ssh_public_key' is not defined"
     quiet: true
-
 
 - name: Set cloud-init fact
   ansible.builtin.set_fact:
@@ -46,7 +44,7 @@
     template: virtualmachine.yml.j2
 
 - name: Wait for VM to be ready
-  kubernetes.core.k8s_info:
+  kubevirt.core.kubevirt_vm_info:
     api_version: kubevirt.io/v1
     kind: VirtualMachine
     name: "{{ collection_name }}"
