@@ -1,10 +1,9 @@
 ---
-
 - name: "Create Namespace {{ collection_namespace }}"
   kubernetes.core.k8s:
     state: present
     template: namespace.yml.j2
-  tag: configure-ocp
+  tags: configure-ocp
 
 - name: Set VM SSH Public Key When Credential Provided
   ansible.builtin.set_fact:
@@ -51,7 +50,7 @@
   tags: configure-ocp
 
 - name: Wait for VM to be ready
-  kubernetes.core.k8s_info:
+  kubevirt.core.kubevirt_vm_info:
     api_version: kubevirt.io/v1
     kind: VirtualMachine
     name: "{{ collection_name }}"
