@@ -1,4 +1,4 @@
-version: 30
+version: 31
 jobs:
 - name: Configure Enviornment
   jobExecutor: default-executor
@@ -15,21 +15,28 @@ jobs:
     runInContainer: false
     interpreter: !DefaultInterpreter
       commands: |
+        whoami
         cd /opt/middleware_ocpv
+        source  /opt/kcli-pipelines/helper_scripts/default.env
+        /usr/local/bin/ansiblesafe -f "${ANSIBLE_VAULT_FILE}" -o 2
+        OFFLINE_TOKEN=$(yq eval '.offline_token' "${ANSIBLE_VAULT_FILE}")
+        echo ${OFFLINE_TOKEN}
+        RHSM_USERNAME=$(yq eval '.rhsm_username' "${ANSIBLE_VAULT_FILE}")
+        RHSM_PASSWORD=$(yq eval '.rhsm_password' "${ANSIBLE_VAULT_FILE}")
+        /usr/local/bin/ansiblesafe -f "${ANSIBLE_VAULT_FILE}" -o 1
+
         cat >vars/provision.yml<<EOF
         ---
         ssh_private_key_path: "@param:SSH_PRIVATE_KEY_PATH@"
         ssh_public_key_path: "@param:SSH_PUBLIC_KEY_PATH@"
 
-        automationhub_token: CHANGEME-OFFLINE-TOKEN
-
-        #"@param:AUTOMATIONHUB_TOKEN@"
+        automationhub_token: "${OFFLINE_TOKEN}"
 
         jbossnetwork_client_id: "@param:JBOSSNETWORK_CLIENT_ID@"
         jbossnetwork_client_secret: "@param:JBOSSNETWORK_CLIENT_SECRET@"
 
-        redhat_csp_username: "@param:REDHAT_CSP_USERNAME@"
-        redhat_csp_password: "@param:REDHAT_CSP_PASSWORD@"
+        redhat_csp_username: ${RHSM_USERNAME}
+        redhat_csp_password: ${RHSM_PASSWORD}
 
         controller_hostname: "@param:CONTROLLER_HOSTNAME@"
         controller_username: "@param:CONTROLLER_USERNAME@"
@@ -45,7 +52,7 @@ jobs:
 
         cat vars/provision.yml
 
-        sed -i 's/token=.*/token=@param:AUTOMATIONHUB_TOKEN@/g' ansible.cfg
+        sed -i "s/token=.*/token=${OFFLINE_TOKEN}/g" ansible.cfg
         cat ansible.cfg
     useTTY: true
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
@@ -95,9 +102,6 @@ jobs:
     multiline: false
     defaultValueProvider: !SpecifiedDefaultValue
       value: /home/lab-user/.ssh/id_rsa.pub
-  - !SecretParam
-    name: AUTOMATIONHUB_TOKEN
-    description: "Steps for obtaining the token can be found\r\nhttps://cloud.redhat.com/ansible/automation-hub/token/"
   - !TextParam
     name: JBOSSNETWORK_CLIENT_ID
     description: "Obtain a Client ID and Client Secret by generating a Service Account\r\nhttps://console.redhat.com/application-services/service-accounts\r\n"
@@ -108,14 +112,6 @@ jobs:
   - !SecretParam
     name: JBOSSNETWORK_CLIENT_SECRET
     description: "Obtain a Client ID and Client Secret by generating a Service Account\r\nhttps://console.redhat.com/application-services/service-accounts"
-  - !TextParam
-    name: REDHAT_CSP_USERNAME
-    allowEmpty: false
-    multiline: false
-    defaultValueProvider: !SpecifiedDefaultValue
-      value: username@redhat.com
-  - !SecretParam
-    name: REDHAT_CSP_PASSWORD
   - !TextParam
     name: CONTROLLER_HOSTNAME
     allowEmpty: false
