@@ -20,7 +20,7 @@ tags:
   - a4mw
 dependencies:
   ansible.posix: '>=1.4.0'
-  kubernetes.core: '>=2.4.0'
+  kubernetes.core: '>=3.0.1'
 repository: https://github.com/redhat-cop/middleware_ocpv
 homepage: https://github.com/redhat-cop/middleware_ocpv
 issues: https://github.com/redhat-cop/middleware_ocpv/issues

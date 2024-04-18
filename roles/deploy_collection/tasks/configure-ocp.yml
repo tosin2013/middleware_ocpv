@@ -1,5 +1,4 @@
 ---
-
 - name: "Create Namespace {{ collection_namespace }}"
   kubernetes.core.k8s:
     state: present
@@ -51,7 +50,7 @@
   tags: configure-ocp
 
 - name: Wait for VM to be ready
-  kubernetes.core.k8s_info:
+  kubevirt.core.kubevirt_vm_info:
     api_version: kubevirt.io/v1
     kind: VirtualMachine
     name: "{{ collection_name }}"

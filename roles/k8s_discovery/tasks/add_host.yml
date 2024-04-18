@@ -1,5 +1,4 @@
 ---
-
 - name: Debug Queried Resource
   ansible.builtin.set_fact:
     k8s_discovery_msg: "{{ queried_resource }}"
@@ -11,3 +10,13 @@
     ansible_host: "{{ item.status.podIP }}"
   loop: "{{ queried_resource.resources }}"
   when: item.kind == "Pod" and item.status.phase == "Running"
+  register: add_host_result
+
+- name: Add host (Pods) using kubevirt plugin
+  plugin: kubevirt.core.kubevirt
+  groups: "{{ queried_resource.discovered_resource.inventory_group_name }}"
+  connections:
+    - name: "{{ item.metadata.name }}"
+      network_name: "{{ item.status.podIP }}"
+  loop: "{{ queried_resource.resources }}"
+  when: item.kind == "Pod" and item.status.phase == "Running" and add_host_result is not succeeded
