@@ -6,11 +6,3 @@ collections:
   - name: https://github.com/ansible-middleware/common
     version: main
     type: git
-  - name: kubernetes.core
-    version: ">=3.0.1"
-  - name: ansible.posix
-    version: ">=1.4.0"
-  - name: ansible.controller
-  - name: infra.controller_configuration
-  - name: redhat.openshift_virtualization
-  - name: kubevirt.core
