@@ -52,7 +52,6 @@
 - name: Wait for VM to be ready
   kubevirt.core.kubevirt_vm_info:
     api_version: kubevirt.io/v1
-    kind: VirtualMachine
     name: "{{ collection_name }}"
     namespace: "{{ collection_namespace }}"
   register: deploy_collection_vm
