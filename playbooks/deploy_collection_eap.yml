@@ -1,12 +1,21 @@
-- name: Deploy Collection
-  hosts: all
+---
+- name: Deploy collection
+  hosts: localhost
   gather_facts: false
   tasks:
-    - name: Include vars
-      ansible.builtin.include_vars: "{{ playbook_dir }}/../vars/{{ provision_var_file | default('provision.yml') }}"
-
-    - name: Call task from role
+    - name: Configure OpenShift
       ansible.builtin.include_role:
         name: deploy_collection
-      tags: configure-vm
- 
+        tasks_from: configure-ocp.yml
+
+    - name: K8s Discovery
+      ansible.builtin.include_role:
+        name: k8s_discovery
+
+- name: EAP  
+  hosts: eap
+  tasks:
+    - name: Configure VM
+      ansible.builtin.include_role:
+        name: redhat.eap.deploy_collection
+        tasks_from: configure-vm.yml

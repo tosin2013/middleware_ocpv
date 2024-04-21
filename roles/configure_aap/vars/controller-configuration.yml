@@ -171,6 +171,19 @@ controller_templates:
     playbook: "{{ aap_template_deploy_vm_playbook }}"
     inventory: "{{ aap_inventory_ocpv_name }}"
     job_tags: configure-ocp
+  - name: Confgure EAP 7.x
+    job_type: run
+    organization: "{{ aap_organization }}"
+    credentials:
+     - "{{ aap_credential_openshift_name }}"
+     - "{{ aap_credential_jbossnetwork_name }}"
+     - "{{ aap_credential_machine_name }}"
+     - "{{ aap_credential_publickey_name }}"
+     - "{{ aap_credential_redhat_csp_name }}"
+    project: "{{ aap_project_ocpv_name }}"
+    playbook: "{{ aap_template_deploy_eap_playbook }}"
+    inventory: "{{ aap_inventory_ocpv_name }}"
+    job_tags: configure-vm
     extra_vars:
       eap_archive_dir: /tmp/eap_archive/
       eap_version: 7.4.0
