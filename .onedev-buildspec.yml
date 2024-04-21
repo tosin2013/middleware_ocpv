@@ -155,7 +155,7 @@ jobs:
     allowEmpty: false
     multiline: false
     defaultValueProvider: !SpecifiedDefaultValue
-      value: https://github.com/tosin2013/middleware_ocpv.git
+      value: http://147.75.81.219:6610/tosin2013/middleware_ocpv.git
   - !TextParam
     name: OPENSHIFT_URL
     allowEmpty: false
