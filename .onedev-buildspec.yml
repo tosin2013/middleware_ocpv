@@ -20,7 +20,7 @@ jobs:
         source  /opt/kcli-pipelines/helper_scripts/default.env
         /usr/local/bin/ansiblesafe -f "${ANSIBLE_VAULT_FILE}" -o 2
         AUTOMATION_HUB_OFFLINE_TOKEN=$(yq eval '.automation_hub_offline_token' "${ANSIBLE_VAULT_FILE}")
-        echo ${OFFLINE_TOKEN}
+        echo ${AUTOMATION_HUB_OFFLINE_TOKEN}
         RHSM_USERNAME=$(yq eval '.rhsm_username' "${ANSIBLE_VAULT_FILE}")
         RHSM_PASSWORD=$(yq eval '.rhsm_password' "${ANSIBLE_VAULT_FILE}")
         /usr/local/bin/ansiblesafe -f "${ANSIBLE_VAULT_FILE}" -o 1
@@ -52,7 +52,7 @@ jobs:
 
         cat vars/provision.yml
 
-        sed -i "s/token=.*/token=${OFFLINE_TOKEN}/g" ansible.cfg
+        sed -i "s/token=.*/token=${AUTOMATION_HUB_OFFLINE_TOKEN}/g" ansible.cfg
         cat ansible.cfg
     useTTY: true
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
