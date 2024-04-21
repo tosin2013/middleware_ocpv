@@ -82,7 +82,7 @@ jobs:
     allowEmpty: false
     multiline: false
     defaultValueProvider: !SpecifiedDefaultValue
-      value: https://github.com/tosin2013/middleware_ocpv.git
+      value: 'http://admin: Wbz86TKvE4ZP6dPYFhTz@147.75.81.219:6610/tosin2013/middleware_ocpv.git'
   - !TextParam
     name: VERBOSE_LEVEL
     allowEmpty: false
