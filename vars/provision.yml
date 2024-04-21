@@ -1,23 +1,22 @@
 ---
+ssh_private_key_path: "/home/lab-user/.ssh/id_rsa"
+ssh_public_key_path: "/home/lab-user/.ssh/id_rsa.pub"
 
-ssh_private_key_path: ""
-ssh_public_key_path: ""
+automationhub_token: "eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI0NzQzYTkzMC03YmJiLTRkZGQtOTgzMS00ODcxNGRlZDc0YjUifQ.eyJpYXQiOjE3MTM1NDIxMzcsImp0aSI6ImJmOWEwZDdhLTI2NjEtNGYzYy1iYjYwLTkyZTc3NjA2MjI2MSIsImlzcyI6Imh0dHBzOi8vc3NvLnJlZGhhdC5jb20vYXV0aC9yZWFsbXMvcmVkaGF0LWV4dGVybmFsIiwiYXVkIjoiaHR0cHM6Ly9zc28ucmVkaGF0LmNvbS9hdXRoL3JlYWxtcy9yZWRoYXQtZXh0ZXJuYWwiLCJzdWIiOiJmOjUyOGQ3NmZmLWY3MDgtNDNlZC04Y2Q1LWZlMTZmNGZlMGNlNjp0YWtpbm9zaEByZWRoYXQuY29tIiwidHlwIjoiT2ZmbGluZSIsImF6cCI6ImNsb3VkLXNlcnZpY2VzIiwibm9uY2UiOiIyMmUwY2M2YS0xOGYzLTQ0NTMtOTEyOS0zY2I4YWY2ZWMzMjAiLCJzZXNzaW9uX3N0YXRlIjoiYzAxOGIyMjktMjMwOS00MTg0LWEyMjktMjdjZmZjMzZlYzA0Iiwic2NvcGUiOiJvcGVuaWQgYXBpLmlhbS5zZXJ2aWNlX2FjY291bnRzIHJvbGVzIHdlYi1vcmlnaW5zIG9mZmxpbmVfYWNjZXNzIiwic2lkIjoiYzAxOGIyMjktMjMwOS00MTg0LWEyMjktMjdjZmZjMzZlYzA0In0.1rpq80bUuHalZ9fbSi07Yx83_OuWN5Qzjgw8w_kjc6DR0JeRS19DKVJZn8s4A4YJSVpGMvQoZmu208eXHAuufg"
 
-automationhub_token: ""
+jbossnetwork_client_id: "999b2b9e-ffc9-45d8-ae15-cde50e2739f2"
+jbossnetwork_client_secret: "0hLvLLuHPvf5QwCnrvOTEBjUGocQoBAT"
 
-jbossnetwork_client_id: ""
-jbossnetwork_client_secret: ""
+redhat_csp_username: takinosh@redhat.com
+redhat_csp_password: c5Xe-d2D4fVM7OlErZHe
 
-redhat_csp_username: ""
-redhat_csp_password: ""
-
-controller_hostname: ""
-controller_username: ""
-controller_password: ""
+controller_hostname: "controller-aap.apps.lab.example.com"
+controller_username: "admin"
+controller_password: "2ksgbyU9weatW0iZvhtblYx6MsqCX5Sd"
 controller_validate_certs: false
 
 aap_controller_namespace: aap
 
-kubeconfig_path: "/home/changeme/.kube/config"
+kubeconfig_path: "/home/remoteuser/.kube/config"
 
 aap_project_ocpv_git_url: https://github.com/tosin2013/middleware_ocpv.git

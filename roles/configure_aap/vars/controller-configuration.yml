@@ -158,3 +158,20 @@ controller_templates:
       eap_version: 7.4.0
       eap_archive_filename: "jboss-eap-7.4.0.zip"
       eap_download_location: "/tmp/eap_archive/jboss-eap-7.4.0.zip"
+  - name: Deploy RHEL 9 VM
+    job_type: run
+    organization: "{{ aap_organization }}"
+    credentials:
+     - "{{ aap_credential_openshift_name }}"
+     - "{{ aap_credential_jbossnetwork_name }}"
+     - "{{ aap_credential_machine_name }}"
+     - "{{ aap_credential_publickey_name }}"
+     - "{{ aap_credential_redhat_csp_name }}"
+    project: "{{ aap_project_ocpv_name }}"
+    playbook: "{{ aap_template_deploy_vm_playbook }}"
+    inventory: "{{ aap_inventory_ocpv_name }}"
+    extra_vars:
+      eap_archive_dir: /tmp/eap_archive/
+      eap_version: 7.4.0
+      eap_archive_filename: "jboss-eap-7.4.0.zip"
+      eap_download_location: "/tmp/eap_archive/jboss-eap-7.4.0.zip"
