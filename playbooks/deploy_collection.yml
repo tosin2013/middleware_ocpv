@@ -7,13 +7,6 @@
     - name: Include vars
       ansible.builtin.include_vars: "{{ playbook_dir }}/../vars/{{ provision_var_file | default('provision.yml') }}"
 
-    - name: List installed collections
-      ansible.builtin.command:
-        cmd: ansible-galaxy collection list
-      register: collections
-    - name: Print installed collections
-      ansible.builtin.debug:
-        var: collections.stdout
     - name: Deploy Collection
       ansible.builtin.include_role:
         name: deploy_collection

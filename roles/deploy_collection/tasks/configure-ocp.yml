@@ -63,16 +63,17 @@
   - deploy_collection_vm.resources[0].status.ready is true
   tags: configure-ocp
 
-- name: Wait for VM IP to be populated
-  kubernetes.core.k8s_info:
+- name: Get information about a VirtualMachine
+  kubevirt.core.kubevirt_vm_info:
     api_version: kubevirt.io/v1
-    kind: VirtualMachineInstance
     name: "{{ collection_name }}"
     namespace: "{{ collection_namespace }}"
-  register: deploy_collection_vmi
+  register: deploy_collection_vm
   retries: 60
   delay: 10
-  until: (deploy_collection_vmi.resources[0].status.interfaces[0]['ipAddress'] | default('')) | length > 0
+  until:
+    - deploy_collection_vm.resources[0].status is defined
+    - deploy_collection_vm.resources[0].status.ready is true
   tags: configure-ocp
 
 - name: Wait for SSH Connection to be ready
