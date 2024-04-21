@@ -170,6 +170,7 @@ controller_templates:
     project: "{{ aap_project_ocpv_name }}"
     playbook: "{{ aap_template_deploy_vm_playbook }}"
     inventory: "{{ aap_inventory_ocpv_name }}"
+    job_tags: configure-ocp
     extra_vars:
       eap_archive_dir: /tmp/eap_archive/
       eap_version: 7.4.0

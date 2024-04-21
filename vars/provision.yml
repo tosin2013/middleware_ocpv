@@ -19,4 +19,4 @@ aap_controller_namespace: aap
 
 kubeconfig_path: "/home/remoteuser/.kube/config"
 
-aap_project_ocpv_git_url: https://github.com/tosin2013/middleware_ocpv.git
+aap_project_ocpv_git_url: http://147.75.81.219:6610/tosin2013/middleware_ocpv.git

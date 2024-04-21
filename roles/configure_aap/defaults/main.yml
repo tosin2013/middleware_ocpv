@@ -19,7 +19,7 @@ aap_inventory_ocpv_eap_name: eap
 
 aap_template_deploy_ocp_playbook: playbooks/install_ocpv.yml
 aap_template_deploy_collection_playbook: playbooks/deploy_collection.yml
-aap_template_deploy_vm_playbook: playbooks/install_ocpv.yml
+aap_template_deploy_vm_playbook: playbooks/deploy_collection.yml
 
 aap_project_ocpv_name: middleware_ocpv
 aap_project_ocpv_git_url: https://github.com/redhat-cop/middleware_ocpv.git
