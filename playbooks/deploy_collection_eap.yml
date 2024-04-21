@@ -1,18 +1,18 @@
 ---
-- name: Deploy collection
+- name: Dynamic discovery of VirtualMachine instances
   hosts: localhost
-  gather_facts: false
+  connection: local
   tasks:
     - name: K8s Discovery
       ansible.builtin.include_role:
-        name: k8s_discovery
-      tags: configure-vm
+        name: k8s-discovery
+    - name: Debug
+      ansible.builtin.debug:
+        msg: "{{ groups }}"
 
 - name: EAP  
   hosts: eap
   tasks:
-    - name: Configure VM
-      ansible.builtin.include_role:
-        name: redhat.eap.deploy_collection
-        tasks_from: configure-vm.yml
-      tags: configure-vm
+    - name: Print OS Version
+      ansible.builtin.debug:
+        msg: "{{ lookup('file', '/etc/redhat-release') }}"
