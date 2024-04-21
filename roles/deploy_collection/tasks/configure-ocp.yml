@@ -65,6 +65,7 @@
 - name: Wait for VM IP to be populated
   kubernetes.core.k8s_info:
     api_version: kubevirt.io/v1
+    kind: VirtualMachineInstance
     name: "{{ collection_name }}"
     namespace: "{{ collection_namespace }}"
   register: deploy_collection_vmi
