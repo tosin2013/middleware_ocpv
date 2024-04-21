@@ -19,7 +19,7 @@ jobs:
         cd /opt/middleware_ocpv
         source  /opt/kcli-pipelines/helper_scripts/default.env
         /usr/local/bin/ansiblesafe -f "${ANSIBLE_VAULT_FILE}" -o 2
-        OFFLINE_TOKEN=$(yq eval '.offline_token' "${ANSIBLE_VAULT_FILE}")
+        AUTOMATION_HUB_OFFLINE_TOKEN=$(yq eval '.automation_hub_offline_token' "${ANSIBLE_VAULT_FILE}")
         echo ${OFFLINE_TOKEN}
         RHSM_USERNAME=$(yq eval '.rhsm_username' "${ANSIBLE_VAULT_FILE}")
         RHSM_PASSWORD=$(yq eval '.rhsm_password' "${ANSIBLE_VAULT_FILE}")
@@ -30,7 +30,7 @@ jobs:
         ssh_private_key_path: "@param:SSH_PRIVATE_KEY_PATH@"
         ssh_public_key_path: "@param:SSH_PUBLIC_KEY_PATH@"
 
-        automationhub_token: "${OFFLINE_TOKEN}"
+        automationhub_token: "${AUTOMATION_HUB_OFFLINE_TOKEN}"
 
         jbossnetwork_client_id: "@param:JBOSSNETWORK_CLIENT_ID@"
         jbossnetwork_client_secret: "@param:JBOSSNETWORK_CLIENT_SECRET@"
