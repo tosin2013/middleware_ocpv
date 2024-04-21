@@ -5,7 +5,7 @@
   tasks:
     - name: K8s Discovery
       ansible.builtin.include_role:
-        name: k8s-discovery
+        name: k8s_discovery
     - name: Debug
       ansible.builtin.debug:
         msg: "{{ groups }}"
