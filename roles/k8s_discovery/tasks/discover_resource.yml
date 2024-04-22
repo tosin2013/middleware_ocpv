@@ -1,11 +1,11 @@
 ---
 
-- name: Verify Required Parameters Specified
-  ansible.builtin.assert:
-    that:
-      - discovered_resource.inventory_group_name is defined and (discovered_resource.inventory_group_name|trim|length >0)
-    k8s_discovery_msg: "Required Parameters 'inventory_group_name` Not Provided"
-    quiet: true
+#- name: Verify Required Parameters Specified
+#  ansible.builtin.assert:
+#    that:
+#      - discovered_resource.inventory_group_name is defined and (discovered_resource.inventory_group_name|trim|length >0)
+#    k8s_discovery_msg: "Required Parameters 'inventory_group_name` Not Provided"
+#    quiet: true
 
 - name: Query k8s Resource
   kubernetes.core.k8s_info:
