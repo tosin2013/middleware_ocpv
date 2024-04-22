@@ -1,5 +1,11 @@
 ---
 
+- name: Discover all pods in the namespace
+  k8s_info:
+    kind: Pod
+    namespace: "{{ k8_namespace }}"
+  register: k8s_discovered_resources
+
 - name: Discover Resources
   ansible.builtin.include_tasks: discover_resource.yml
   loop_control:

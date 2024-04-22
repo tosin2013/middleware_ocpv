@@ -1,6 +1,8 @@
 ---
 # defaults file for k8s_discovery
 
+k8_namespace: ansible-middleware-ocpv
+
 k8s_group_label: ""
 k8s_resource_type: "pods"
 
