@@ -24,3 +24,7 @@
 - name: Aggregate Queried Resources
   ansible.builtin.set_fact:
     k8s_discovery_combined_queried_resources: "{{ k8s_discovery_combined_queried_resources | default([]) + [{'discovered_resource': discovered_resource, 'resources': k8s_discovery_queried_resources.resources}] }}"
+
+- name: Debug Combined Queried Resources
+  ansible.builtin.set_fact:
+    k8s_discovery_msg: "{{ k8s_discovery_combined_queried_resources }}"
